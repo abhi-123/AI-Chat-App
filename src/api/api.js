@@ -1,4 +1,4 @@
-const baseURl = "https://ai-chat-app-kt9w.onrender.com/";
+const baseURl = "https://ai-chat-app-kt9w.onrender.com";
 //const baseURl = "http://127.0.0.1:8000";
 
 export const getResponse = async (message) => {
