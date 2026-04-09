@@ -146,10 +146,9 @@ function InputMessage({ scrollToBottom }) {
   };
   return (
     <div className="p-4 sm:p-5 border-t border-white/10 flex gap-2">
-      <input
-        type="text"
+      <textarea
         placeholder="Type a message..."
-        className="flex-1 bg-white/10 text-white placeholder-gray-400 px-4 py-2 rounded-lg outline-none backdrop-blur-md"
+        className="flex-1 bg-white/10 text-white placeholder-gray-400 px-4 py-2 rounded-lg outline-none backdrop-blur-md resize-none"
         value={text}
         onChange={(e) => setText(e.target.value)}
         onKeyDown={(e) => {
