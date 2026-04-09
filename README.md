@@ -19,7 +19,7 @@
 
 <img src="screenshot.png"/>
 
-## 🌐 **Live Demo:** https://ai-smart-manager.vercel.app/
+## 🌐 **Live Demo:** https://ai-chat-app-six-alpha.vercel.app/
 
 ### ✨ What you get
 
