@@ -95,6 +95,8 @@ function InputMessage({ scrollToBottom }) {
   };
 
   const handleSubmit = async () => {
+    let errorMessage = `😅 I’m having trouble responding right now. It might be a network issue or a temporary glitch.  
+    Please try again — I’ll be right here!`;
     if (!text.trim()) return;
 
     const userMessage = {
@@ -123,25 +125,30 @@ function InputMessage({ scrollToBottom }) {
       },
     });
     try {
-      dispatch({
-        type: "SET_LOADING",
-        payload: true,
-      });
-      // 2️⃣ API CALLd
-      const response = await getResponse(apiMessages);
-      //   dispatch({
-      //     type: "SET_LOADING",
-      //     payload: false,
-      //   });
+      dispatch({ type: "SET_LOADING", payload: true });
 
-      //if (response.task)
-      streamMessage(response, aiID);
+      const response = await getResponse(apiMessages);
+
+      if (!response.ok) {
+        dispatch({
+          type: "STREAM_AI_MESSAGE",
+          payload: { id: aiID, message: errorMessage },
+        });
+        return;
+      }
+
+      await streamMessage(response, aiID);
     } catch (error) {
-      dispatch({
-        type: "SET_LOADING",
-        payload: false,
-      });
-      console.log(error);
+      console.log("RAW ERROR:", error);
+
+      if (!navigator.onLine || error.message.includes("Failed to fetch")) {
+        dispatch({
+          type: "STREAM_AI_MESSAGE",
+          payload: { id: aiID, message: errorMessage },
+        });
+      }
+    } finally {
+      dispatch({ type: "SET_LOADING", payload: false });
     }
   };
   return (
