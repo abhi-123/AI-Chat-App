@@ -2,14 +2,28 @@ import Header from "./Header";
 import MessageContainer from "./MessageContainer";
 import InputMessage from "./InputMessage";
 import { useAutoScroll } from "../hooks/useAutoScroll";
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { MessageContext } from "../context/MessageContext";
 
 function ChatLayout() {
   const { state } = useContext(MessageContext);
+  const [isOnline, setIsOnline] = useState(navigator.onLine);
   const { bottomRef, containerRef, scrollToBottom } = useAutoScroll(
     state.messages,
   );
+
+  useEffect(() => {
+    const goOnline = () => setIsOnline(true);
+    const goOffline = () => setIsOnline(false);
+
+    window.addEventListener("online", goOnline);
+    window.addEventListener("offline", goOffline);
+
+    return () => {
+      window.removeEventListener("online", goOnline);
+      window.removeEventListener("offline", goOffline);
+    };
+  }, []);
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-900 via-gray-900 to-black flex items-center justify-center p-4">
       {/* Glass Container */}
@@ -33,13 +47,13 @@ overflow-hidden
     "
       >
         {/* Header */}
-        <Header />
+        <Header isOnline={isOnline} />
 
         {/* Messages */}
         <MessageContainer containerRef={containerRef} bottomRef={bottomRef} />
 
         {/* Input */}
-        <InputMessage scrollToBottom={scrollToBottom} />
+        <InputMessage scrollToBottom={scrollToBottom} isOnline={isOnline} />
       </div>
     </div>
   );

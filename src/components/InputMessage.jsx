@@ -2,7 +2,7 @@ import { useContext, useState } from "react";
 import { MessageContext } from "../context/MessageContext";
 import { getResponse } from "../api/api";
 
-function InputMessage({ scrollToBottom }) {
+function InputMessage({ scrollToBottom, isOnline }) {
   const { state, dispatch } = useContext(MessageContext);
 
   const [text, setText] = useState("");
@@ -95,8 +95,6 @@ function InputMessage({ scrollToBottom }) {
   };
 
   const handleSubmit = async () => {
-    let errorMessage = `😅 I’m having trouble responding right now. It might be a network issue or a temporary glitch.  
-    Please try again — I’ll be right here!`;
     if (!text.trim()) return;
 
     const userMessage = {
@@ -130,9 +128,11 @@ function InputMessage({ scrollToBottom }) {
       const response = await getResponse(apiMessages);
 
       if (!response.ok) {
+        let message =
+          "⚠️ I couldn’t process your request right now.\n\nPlease try again shortly.";
         dispatch({
           type: "STREAM_AI_MESSAGE",
-          payload: { id: aiID, message: errorMessage },
+          payload: { id: aiID, message: message },
         });
         return;
       }
@@ -141,12 +141,22 @@ function InputMessage({ scrollToBottom }) {
     } catch (error) {
       console.log("RAW ERROR:", error);
 
-      if (!navigator.onLine || error.message.includes("Failed to fetch")) {
-        dispatch({
-          type: "STREAM_AI_MESSAGE",
-          payload: { id: aiID, message: errorMessage },
-        });
+      let message = "";
+
+      if (!navigator.onLine) {
+        message =
+          "🌐 You’re currently offline.\n\nPlease check your internet connection and try again.";
+      } else if (error.message.includes("Failed to fetch")) {
+        message =
+          "⚠️ I couldn’t reach the server right now.\n\nPlease try again in a few moments.";
+      } else {
+        message =
+          "😅 Something didn’t go as expected.\n\nPlease try again — I’ll be right here!";
       }
+      dispatch({
+        type: "STREAM_AI_MESSAGE",
+        payload: { id: aiID, message: message },
+      });
     } finally {
       dispatch({ type: "SET_LOADING", payload: false });
     }
@@ -172,7 +182,7 @@ function InputMessage({ scrollToBottom }) {
       />
       <button
         className="bg-blue-500 hover:bg-blue-600 text-white px-4 sm:px-5 py-2 rounded-lg transition disabled:opacity-50"
-        disabled={!text.trim()}
+        disabled={!text.trim() || !isOnline}
         onClick={handleSubmit}
       >
         Send
