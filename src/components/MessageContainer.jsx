@@ -43,7 +43,7 @@ function MessageContainer({ containerRef, bottomRef }) {
             {message?.role === "assistant" && message?.content !== "" && (
               <div className="flex items-start gap-3">
                 {/* Avatar */}
-                <div className="w-8 h-8 flex items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-500 text-white text-sm shadow">
+                <div className="w-8 h-8 flex shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-500 text-white text-sm shadow">
                   🤖
                 </div>
 
